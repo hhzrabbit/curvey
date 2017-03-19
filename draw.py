@@ -2,22 +2,52 @@ from display import *
 from matrix import *
 from math import *
 
-def add_circle( points, cx, cy, cz, r, step ):
+def add_circle( points, cx, cy, cz, r, step ):    
+    origX = r + cx
+    origY = cy
+    add_point(points, origX, origY, 0)
     incr = 1.0 / step
-    t = 0
-    x = -1
-    y = -1
+    t = incr
     while t < 1:
         theta = t * 2 * pi
         x = r * cos(theta) + cx
         y = r * sin(theta) + cy
         add_point(points, x, y)
-        if len(points) % 2 == 0:
-            add_point(points, x, y)
+        add_point(points, x, y)
         t += incr
         
+    add_point(points, origX, origY)
+
+    
 def add_curve( points, x0, y0, x1, y1, x2, y2, x3, y3, step, curve_type ):
-    pass
+    incr = 1.0 / step
+    t = incr
+    if curve_type == "hermite":
+        pass
+        #x2 is m0_x, y2 is m0_y, x3 is m1_x, y3 is m1_y
+        x_coef = generate_curve_coefs(x0, x1, x2, x3, "hermite")[0]
+        y_coef = generate_curve_coefs(y0, y1, y2, y3, "hermite")[0]
+        add_point(points, x_coef[3], y_coef[3])
+        while t < 1:
+            break
+        add_point(points,
+                  x_coef[0] + x_coef[1] + x_coef[2] + x_coef[3],
+                  y_coef[0] + y_coef[1] + y_coef[2] + y_coef[3])
+
+    else: #bezier
+        x_coef = generate_curve_coefs(x0, x1, x2, x3, "bezier")[0]
+        y_coef = generate_curve_coefs(y0, y1, y2, y3, "bezier")[0]
+        add_point(points, x_coef[3], y_coef[3])
+        while t < 1:
+            x = x_coef[0] * t**3 + x_coef[1] * t**2 + x_coef[2] * t + x_coef[3]
+            y = y_coef[0] * t**3 + y_coef[1] * t**2 + y_coef[2] * t + y_coef[3]
+            print "x", x, "y", y
+            add_point(points, x, y)
+            add_point(points, x, y)
+            t += incr
+        add_point(points,
+                  x_coef[0] + x_coef[1] + x_coef[2] + x_coef[3],
+                  y_coef[0] + y_coef[1] + y_coef[2] + y_coef[3])
 
 def draw_lines( matrix, screen, color ):
     if len(matrix) < 2:
@@ -41,7 +71,6 @@ def add_point( matrix, x, y, z=0 ):
     matrix.append( [x, y, z, 1] )
 
 def draw_line( x0, y0, x1, y1, screen, color ):
-    print x0, y0, x1, y1
     #swap points if going right -> left
     if x0 > x1:
         xt = x0

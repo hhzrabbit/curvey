@@ -19,8 +19,8 @@ transform = new_matrix()
 # print
 # print_matrix( make_rotZ(math.pi/4) )
 
-add_circle(edges, 250, 250, 0, 100, 9)
-draw_lines(edges, screen, color)
-display(screen)
+# add_circle(edges, 150, 150, 0, 100, 9)
+# draw_lines(edges, screen, color)
+# display(screen)
 
-#parse_file( 'script', edges, transform, screen, color )
+parse_file( 'script', edges, transform, screen, color )
